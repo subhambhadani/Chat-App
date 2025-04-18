@@ -18,8 +18,9 @@ Make sure you have the following installed on your system:
 ## Installation and Setup
 
 1. **Clone the Repository**:
-   git clone <repository-url>
-   cd Chat-app
+
+   - git clone <repository-url>
+   - cd Chat-app
 
 2. **Install Dependencies: Run the following command to install the required dependencies**:
    npm install
