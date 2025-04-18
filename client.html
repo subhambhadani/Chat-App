@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #chat-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #messages-list {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: #fff;
+        }
+        #message-input {
+            display: flex;
+            gap: 10px;
+        }
+        #message-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #message-input button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #message-input button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="messages-list"></div>
+        <div id="message-input">
+            <input type="text" id="message" placeholder="Type your message here..." />
+            <button id="send-message">Send</button>
+        </div>
+    </div>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io.connect('http://localhost:3000');
+        const messageInput = document.getElementById('message'); 
+        const messageList = document.getElementById('messages-list'); 
+        const sendButton = document.getElementById('send-message'); 
+    
+        // Function to send a message
+        const sendMessage = () => {
+            const message = messageInput.value;
+            if (message.trim() !== '') {
+                socket.emit('chat message', message);
+    
+                const messageElement = document.createElement('div');
+                messageElement.textContent = `You: ${message}`;
+                messageList.appendChild(messageElement);
+                messageList.scrollTop = messageList.scrollHeight; // Auto-scroll to the bottom
+                messageInput.value = '';
+            }
+        };
+        
+        // Listen to broadcast message and add it to the message list
+        socket.on('broadcast_message', (message) => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            messageList.appendChild(messageElement); 
+            messageList.scrollTop = messageList.scrollHeight; // Auto-scroll to the bottom
+        });
+    
+        // Send message when the "Send" button is clicked
+        sendButton.addEventListener('click', sendMessage);
+    
+        // Send message when the "Enter" key is pressed
+        messageInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    
+        // Receive message from server
+        socket.on('chat message', (msg) => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = msg;
+            messageList.appendChild(messageElement); // Corrected to append to the correct message list
+            messageList.scrollTop = messageList.scrollHeight; // Auto-scroll to the bottom
+        });
+    </script>
+</body>
+</html>
