@@ -62,8 +62,13 @@
         </div>
     </div>
     <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    
+
     <script>
         const socket = io.connect('http://localhost:3000');
+        const username = prompt("Enter your username:"); // Prompt for username
+        // emit the username to the server
+        socket.emit("join", username); // Emit the join event with the username
         const messageInput = document.getElementById('message'); 
         const messageList = document.getElementById('messages-list'); 
         const sendButton = document.getElementById('send-message'); 
@@ -75,7 +80,7 @@
                 socket.emit('chat message', message);
     
                 const messageElement = document.createElement('div');
-                messageElement.textContent = `You: ${message}`;
+                messageElement.textContent = `${username}: ${message}`;
                 messageList.appendChild(messageElement);
                 messageList.scrollTop = messageList.scrollHeight; // Auto-scroll to the bottom
                 messageInput.value = '';
@@ -83,9 +88,9 @@
         };
         
         // Listen to broadcast message and add it to the message list
-        socket.on('broadcast_message', (message) => {
+        socket.on('broadcast_message', (userMessage) => {
             const messageElement = document.createElement('div');
-            messageElement.textContent = message;
+            messageElement.textContent = userMessage.username + ': ' + userMessage.message; // Display username and message
             messageList.appendChild(messageElement); 
             messageList.scrollTop = messageList.scrollHeight; // Auto-scroll to the bottom
         });
